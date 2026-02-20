@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #147CD0;
+            --primary-blue-hover: #1066ac;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-color: #dcdcdc;
+            --bg-color: #f4f6f8;
+            --white: #ffffff;
+            --error-red: #d93025;
+            --dashed-border: #147CD0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .checkout-container {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 460px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 15px;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .form-label span.required {
+            color: var(--error-red);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #b3b3b3;
+            border-radius: 6px;
+            font-size: 15px;
+            color: var(--text-main);
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 1px var(--primary-blue);
+        }
+
+        .form-control.error {
+            border-color: var(--error-red);
+        }
+
+        .error-message {
+            color: var(--error-red);
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            width: 100%;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-blue-hover);
+        }
+
+        .secure-text {
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        /* Step Transitions */
+        .step {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            width: 100%;
+        }
+
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateX(10px);
+        }
+
+        .step-active {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Step 2 Specifics */
+        .back-btn {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 25px;
+            padding: 0;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            color: var(--text-main);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            color: #88a2c4;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        /* Payment Section */
+        .payment-box {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 25px;
+            background: var(--white);
+        }
+
+        .payment-header {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #fff;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .radio-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            color: #555;
+            font-size: 15px;
+        }
+
+        .custom-radio {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: grid;
+            place-content: center;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .custom-radio::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            background-color: #f15a2b;
+            /* Orange accent */
+        }
+
+        .custom-radio:checked {
+            border-color: #f15a2b;
+        }
+
+        .custom-radio:checked::before {
+            transform: scale(1);
+        }
+
+        .card-icons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .card-icons img {
+            height: 22px;
+        }
+
+        .payment-body {
+            padding: 15px;
+            background-color: #FAFAFA;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .input-label-sm {
+            font-weight: 500;
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .card-input-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .card-input-badge {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1a1a1a;
+            color: #fff;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        /* Generic Mastercard style interlocking circles */
+        .card-input-badge .cc-icon {
+            width: 16px;
+            height: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .card-input-badge .cc-icon::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #eb001b;
+            border-radius: 50%;
+            left: 0;
+            z-index: 1;
+        }
+
+        .card-input-badge .cc-icon::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f79e1b;
+            border-radius: 50%;
+            right: 0;
+            z-index: 2;
+            opacity: 0.9;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        /* Pre-total row */
+        .pre-total-row {
+            margin: 20px 0 0 0;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            color: #88a2c4;
+            margin-bottom: 25px;
+            font-size: 13px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        #total-price {
+            font-weight: 700;
+            color: var(--primary-blue);
+            font-size: 14px;
+        }
+
+        /* Add-ons List */
+        .addons-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .addon-item {
+            border: 1px dashed var(--dashed-border);
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            gap: 12px;
+            background-color: var(--white);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            align-items: flex-start;
+        }
+
+        .custom-checkbox {
+            appearance: none;
+            min-width: 20px;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary-blue);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            background: white;
+            margin-top: 1px;
+        }
+
+        .custom-checkbox:checked {
+            background-color: var(--primary-blue);
+        }
+
+        .custom-checkbox:checked::after {
+            content: "✓";
+            color: white;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .addon-content {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-main);
+        }
+
+        .addon-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .promo-badge {
+            font-weight: 800;
+            color: var(--primary-blue);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: var(--text-muted);
+            margin-left: 2px;
+            font-weight: 500;
+        }
+
+        .new-price {
+            color: var(--primary-blue);
+            font-weight: 800;
+            margin-left: 2px;
+        }
+
+        .addon-desc {
+            color: #333;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="checkout-container">
+        <!-- STEP 1: Basic Info -->
+        <div id="step1" class="step step-active">
+            <div class="form-group">
+                <label for="email" class="form-label">Email<span class="required">*</span></label>
+                <input type="email" id="email" class="form-control" placeholder="talai.ricard22@gmail.com" required>
+                <div class="error-message" id="email-error">Please enter a valid email address.</div>
+            </div>
+
+            <button type="button" class="btn-primary" id="btn-next">
+                Activate My Access
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+
+            <div class="secure-text">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Your information is 100% secure and private
+            </div>
+        </div>
+
+        <!-- STEP 2: Payment & Add-ons -->
+        <div id="step2" class="step step-hidden">
+            <button class="back-btn" id="btn-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 14L4 9M4 9L9 4M4 9H16C19.3137 9 22 11.6863 22 15V15C22 18.3137 19.3137 21 16 21H14" />
+                </svg>
+                Edit details
+            </button>
+
+            <div class="header-row">
+                <span>Product</span>
+                <span>Price</span>
+            </div>
+
+            <div class="payment-box">
+                <div class="payment-header">
+                    <label class="radio-wrapper">
+                        <input type="radio" name="payment_method" value="card" class="custom-radio" checked>
+                        Credit/Debit Card
+                    </label>
+                    <div class="card-icons">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Visa_Inc._logo_%282005%E2%80%932014%29.svg"
+                            alt="Visa" style="object-fit: contain; width: 34px; border-radius: 2px;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/MasterCard_Logo.svg"
+                            alt="Mastercard" style="object-fit: contain; width: 34px; border-radius: 2px;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg"
+                            alt="Amex" style="object-fit: contain; width: 34px; border-radius: 2px;">
+                    </div>
+                </div>
+                <div class="payment-body">
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label class="input-label-sm">Card number</label>
+                        <div class="card-input-wrapper">
+                            <input type="text" class="form-control" placeholder="1234 1234 1234 1234"
+                                style="color: #ccc;">
+                            <div class="card-input-badge">
+                                <span style="font-size: 10px; margin-right: 2px;">link</span>
+                                <div class="cc-icon"></div>
+                                <span>3456</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label class="input-label-sm">MM/YY</label>
+                            <input type="text" class="form-control" placeholder="MM / AA" style="color: #ccc;">
+                        </div>
+                        <div class="col">
+                            <label class="input-label-sm">CVC</label>
+                            <input type="text" class="form-control" placeholder="CVC" style="color: #ccc;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-row pre-total-row">
+                <span>Product</span>
+                <span>Price</span>
+            </div>
+
+            <div class="total-row">
+                <span>Total</span>
+                <span id="total-price">$0.00</span>
+            </div>
+
+            <!-- Add-ons List -->
+            <div class="addons-list" id="addons-container">
+                <!-- Add-ons injected via JS -->
+            </div>
+
+            <button type="button" class="btn-primary" id="btn-submit">
+                Get instant access now
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // State setup
+            const state = {
+                step: 1,
+                email: '',
+                totalPrice: 0,
+                basePrice: 0,
+                addons: [
+                    {
+                        id: 'addon1',
+                        title: 'Yes, I want the "Alpha Morning" Testosterone Ritual',
+                        promoBox: '🎁 FREE!',
+                        desc: 'This 5-minute morning routine naturally boosts your testosterone by 30% and gives you rock-solid erections.',
+                        originalPrice: 47,
+                        price: 0,
+                        selected: true
+                    },
+                    {
+                        id: 'addon2',
+                        title: 'Yes, I want the 10 "Power Performance" Quick Recipes',
+                        promoBox: '🎁 FREE!',
+                        desc: '10 delicious meals that naturally boost your bedroom performance. Ready in minutes.',
+                        originalPrice: 0,
+                        price: 0,
+                        selected: true
+                    },
+                    {
+                        id: 'addon3',
+                        title: 'Yes, I want the "Performance Anxiety Destroyer" Audio Program',
+                        promoBox: '🎁 LIMITED OFFER!',
+                        desc: 'Eliminate performance anxiety and mental blocks in just 8 days with this clinical hypnosis audio program. Listen for 7 minutes daily and rewire your brain for confidence.',
+                        originalPrice: 47,
+                        price: 7,
+                        selected: true
+                    },
+                    {
+                        id: 'addon4',
+                        title: 'Yes, I want "Her Secret Desire" Female Libido Recipe System',
+                        promoBox: '🎁 LIMITED OFFER!',
+                        desc: 'Make HER desire YOU again with these 15 natural aphrodisiac ingredients you can add to regular meals. 82% of couples report increased intimacy and passion.',
+                        originalPrice: 87,
+                        price: 9,
+                        selected: true
+                    }
+                ]
+            };
+
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const emailInput = document.getElementById('email');
+            const emailError = document.getElementById('email-error');
+            const btnNext = document.getElementById('btn-next');
+            const btnBack = document.getElementById('btn-back');
+            const addonsContainer = document.getElementById('addons-container');
+            const totalPriceEl = document.getElementById('total-price');
+
+            const validateEmail = (email) => {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(String(email).toLowerCase());
+            };
+
+            const renderTotal = () => {
+                let currentTotal = state.basePrice;
+                state.addons.forEach(addon => {
+                    if (addon.selected) {
+                        currentTotal += addon.price;
+                    }
+                });
+                state.totalPrice = currentTotal;
+                totalPriceEl.textContent = `$${currentTotal.toFixed(2)}`;
+            };
+
+            const toggleAddon = (addonId) => {
+                const addon = state.addons.find(a => a.id === addonId);
+                if (addon) {
+                    addon.selected = !addon.selected;
+                    const checkbox = document.getElementById(`chk-${addonId}`);
+                    checkbox.checked = addon.selected;
+                    renderTotal();
+                }
+            };
+
+            const renderAddons = () => {
+                addonsContainer.innerHTML = '';
+                state.addons.forEach(addon => {
+
+                    const origPriceHtml = addon.originalPrice ? `<span class="original-price">$${addon.originalPrice}</span>` : '';
+                    const newPriceHtml = `<span class="new-price">$${addon.price}</span>`;
+                    const checkedAttr = addon.selected ? 'checked' : '';
+
+                    const html = `
+                        <label class="addon-item" id="box-${addon.id}">
+                            <input type="checkbox" class="custom-checkbox" id="chk-${addon.id}" data-id="${addon.id}" ${checkedAttr}>
+                            <div class="addon-content">
+                                <div class="addon-title">${addon.title}</div>
+                                <div class="addon-desc">
+                                    <span class="promo-badge">${addon.promoBox}</span>
+                                    ${addon.desc} ${origPriceHtml}${newPriceHtml}
+                                </div>
+                            </div>
+                        </label>
+                    `;
+                    addonsContainer.insertAdjacentHTML('beforeend', html);
+                });
+
+                const checkboxes = addonsContainer.querySelectorAll('.custom-checkbox');
+                checkboxes.forEach(chk => {
+                    chk.addEventListener('change', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        toggleAddon(id);
+                    });
+                });
+            };
+
+            btnNext.addEventListener('click', () => {
+                const email = emailInput.value.trim();
+
+                if (validateEmail(email)) {
+                    emailInput.classList.remove('error');
+                    emailError.style.display = 'none';
+                    state.email = email;
+
+                    step1.classList.remove('step-active');
+                    step1.classList.add('step-hidden');
+
+                    setTimeout(() => {
+                        step2.classList.remove('step-hidden');
+                        step2.classList.add('step-active');
+                    }, 300);
+
+                } else {
+                    emailInput.classList.add('error');
+                    emailError.style.display = 'block';
+                }
+            });
+
+            btnBack.addEventListener('click', () => {
+                step2.classList.remove('step-active');
+                step2.classList.add('step-hidden');
+
+                setTimeout(() => {
+                    step1.classList.remove('step-hidden');
+                    step1.classList.add('step-active');
+                }, 300);
+            });
+
+            // Initial Render
+            renderAddons();
+            renderTotal();
+        });
+    </script>
+</body>
+
+</html>
