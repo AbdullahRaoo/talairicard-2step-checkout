@@ -769,7 +769,7 @@
                 });
             };
 
-            btnNext.addEventListener('click', () => {
+            const proceedToStep2 = () => {
                 const email = emailInput.value.trim();
 
                 if (validateEmail(email)) {
@@ -788,6 +788,15 @@
                 } else {
                     emailInput.classList.add('error');
                     emailError.style.display = 'block';
+                }
+            };
+
+            btnNext.addEventListener('click', proceedToStep2);
+
+            emailInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    proceedToStep2();
                 }
             });
 
