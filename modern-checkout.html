@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Checkout</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* Vibrant & Elegant Color Palette */
+            --primary: #8B5CF6;
+            /* Vibrant Violet */
+            --primary-hover: #7C3AED;
+            --primary-gradient: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+            /* Violet to Pink */
+
+            --secondary: #10B981;
+            /* Emerald */
+            --secondary-hover: #059669;
+            --secondary-gradient: linear-gradient(135deg, #10B981 0%, #047857 100%);
+
+            --bg-color: #F8FAFC;
+            --bg-pattern: radial-gradient(#E2E8F0 1px, transparent 1px);
+
+            --surface: #FFFFFF;
+            --text-main: #0F172A;
+            /* Slate 900 */
+            --text-muted: #64748B;
+            /* Slate 500 */
+            --border: #E2E8F0;
+            /* Slate 200 */
+            --border-hover: #CBD5E1;
+
+            --error: #EF4444;
+
+            --focus-ring: rgba(139, 92, 246, 0.25);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-primary: 0 10px 25px -5px rgba(139, 92, 246, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--bg-pattern);
+            background-size: 20px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 60px 20px;
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Container */
+        .checkout-container {
+            background-color: var(--surface);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 540px;
+            padding: 40px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            z-index: 1;
+        }
+
+        /* Decorative Background Blob */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -10vw;
+            right: -10vw;
+            width: 40vw;
+            height: 40vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Step Indicator (Timeline) */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            right: 30px;
+            height: 4px;
+            background-color: var(--border);
+            z-index: -1;
+            transform: translateY(-50%);
+            border-radius: 4px;
+        }
+
+        .step-progress-line {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            height: 4px;
+            background: var(--primary-gradient);
+            z-index: -1;
+            transform: translateY(-50%);
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 0%;
+            border-radius: 4px;
+        }
+
+        .step-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            background: var(--surface);
+            padding: 0 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .step-nav-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .step-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--surface);
+            border: 2px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+        }
+
+        .step-nav-item.active .step-dot {
+            border-color: transparent;
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 0 0 4px var(--focus-ring);
+        }
+
+        .step-nav-item.completed .step-dot {
+            border-color: transparent;
+            color: white;
+            background: var(--secondary-gradient);
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .step-nav-item.active .step-label {
+            color: var(--primary);
+        }
+
+        .step-nav-item.completed .step-label {
+            color: var(--secondary);
+        }
+
+        /* Headings */
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 28px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 16px;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            background-color: #FFFFFF;
+            font-weight: 500;
+        }
+
+        .form-control::placeholder {
+            color: #94A3B8;
+            font-weight: 400;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--focus-ring);
+        }
+
+        .form-control.error {
+            border-color: var(--error);
+            background-color: #FEF2F2;
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+            font-weight: 600;
+        }
+
+        /* Modern Button */
+        .btn-primary {
+            width: 100%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Shimmer effect on button */
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: rotate(30deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 15px 30px -5px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-primary:hover::after {
+            opacity: 1;
+            left: 100%;
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .btn-success {
+            background: var(--secondary-gradient);
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 15px 30px -5px rgba(16, 185, 129, 0.5);
+        }
+
+        .secure-text {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        /* Steps Layout / Animation */
+        .step-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Step 2 specific modernizations */
+
+        /* Payment Accordion */
+        .payment-options-container {
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 32px;
+            background: var(--surface);
+            transition: border-color 0.3s ease;
+        }
+
+        .payment-option-header {
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--surface);
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background-color 0.2s;
+        }
+
+        .payment-option-header:last-child {
+            border-bottom: none;
+        }
+
+        .payment-option-header:hover {
+            background-color: #F8FAFC;
+        }
+
+        .payment-option-header.active {
+            background-color: #F8FAFC;
+        }
+
+        .radio-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 16px;
+            pointer-events: none;
+            /* Let header handle click */
+        }
+
+        .custom-radio {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #CBD5E1;
+            display: grid;
+            place-content: center;
+            margin: 0;
+            transition: all 0.2s ease;
+        }
+
+        .custom-radio::before {
+            content: "";
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            transform: scale(0);
+            transition: 0.2s transform cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: var(--primary-gradient);
+        }
+
+        .custom-radio:checked {
+            border-color: var(--primary);
+        }
+
+        .custom-radio:checked::before {
+            transform: scale(1);
+        }
+
+        .payment-logos {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .payment-logos img {
+            height: 24px;
+            object-fit: contain;
+        }
+
+        /* CC Input Body */
+        .payment-body-cc {
+            padding: 24px;
+            background-color: #F8FAFC;
+            border-bottom: 1px solid var(--border);
+            display: block;
+            /* Shown by default */
+            animation: slideDown 0.3s ease-out;
+            transform-origin: top;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: scaleY(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+        }
+
+        .row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .card-input-wrapper {
+            position: relative;
+        }
+
+        .card-input-badge {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #0F172A;
+            color: #fff;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Order Summary */
+        .order-summary {
+            background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .summary-header {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed var(--border-hover);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 16px;
+            margin-top: 10px;
+        }
+
+        .total-label {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text-main);
+        }
+
+        #total-price {
+            font-family: 'Outfit', sans-serif;
+            color: var(--primary);
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        /* Sleek Add-ons */
+        .addons-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .addon-item {
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            gap: 16px;
+            background-color: var(--surface);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .addon-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: transparent;
+            transition: background 0.3s ease;
+        }
+
+        .addon-item:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .addon-item.selected {
+            border-color: var(--primary);
+            background-color: #F5F3FF;
+            /* Very light violet */
+            box-shadow: var(--shadow-sm);
+        }
+
+        .addon-item.selected::before {
+            background: var(--primary-gradient);
+        }
+
+        .custom-checkbox {
+            appearance: none;
+            min-width: 28px;
+            width: 28px;
+            height: 28px;
+            border: 2px solid #CBD5E1;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: white;
+            margin-top: 2px;
+        }
+
+        .addon-item.selected .custom-checkbox {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .addon-item.selected .custom-checkbox::after {
+            content: "✓";
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .addon-content {
+            flex: 1;
+        }
+
+        .addon-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .addon-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-main);
+            line-height: 1.4;
+            padding-right: 15px;
+        }
+
+        .addon-price-tag {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .addon-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .promo-badge {
+            background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 100%);
+            color: #78350F;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+        }
+
+        .promo-badge.violet {
+            background: linear-gradient(135deg, #DDD6FE 0%, #A78BFA 100%);
+            color: #4C1D95;
+            box-shadow: 0 2px 4px rgba(167, 139, 250, 0.2);
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #94A3B8;
+            font-weight: 500;
+            font-size: 14px;
+            margin-right: 6px;
+        }
+
+        /* Modal Overlay - Thank You Popup */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            width: 90%;
+            max-width: 440px;
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #D1FAE5;
+            color: #10B981;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 24px;
+        }
+
+        .modal-icon svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 12px;
+        }
+
+        .modal-text {
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="checkout-container">
+
+        <!-- Modern Step Indicator (Clickable Nav) -->
+        <div class="step-indicator">
+            <div class="step-progress-line" id="progress-line"></div>
+
+            <div class="step-nav-item active" id="nav-step-1">
+                <div class="step-dot">1</div>
+                <div class="step-label">Account</div>
+            </div>
+
+            <div class="step-nav-item" id="nav-step-2">
+                <div class="step-dot">2</div>
+                <div class="step-label">Payment</div>
+            </div>
+        </div>
+
+        <!-- STEP 1: Basic Info -->
+        <div id="step1" class="step-content active">
+
+            <h2>Create your account</h2>
+            <p class="subtitle">Enter your email to secure your access.</p>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" id="email" class="form-control" placeholder="you@example.com" required>
+                <div class="error-message" id="email-error">Please enter a valid email address.</div>
+            </div>
+
+            <button type="button" class="btn-primary" id="btn-next">
+                Continue to Payment
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+
+            <div class="secure-text">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                256-bit SSL secured checkout
+            </div>
+        </div>
+
+        <!-- STEP 2: Payment & Add-ons -->
+        <div id="step2" class="step-content">
+
+            <h2>Payment Details</h2>
+            <p class="subtitle">Complete your purchase below.</p>
+
+            <!-- Payment Methods Accordion -->
+            <div class="payment-options-container">
+
+                <!-- Credit Card Option -->
+                <div class="payment-option-header" id="opt-cc">
+                    <div class="radio-wrapper">
+                        <input type="radio" name="payment_method" value="card" class="custom-radio" checked
+                            id="radio-cc">
+                        Credit Card
+                    </div>
+                    <div class="payment-logos">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/MasterCard_Logo.svg"
+                            alt="Mastercard">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg"
+                            alt="Amex">
+                    </div>
+                </div>
+                <!-- CC Form Body -->
+                <div class="payment-body-cc" id="body-cc">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label" style="font-size: 13px; color: var(--text-muted);">Card Number</label>
+                        <div class="card-input-wrapper">
+                            <input type="text" class="form-control" placeholder="0000 0000 0000 0000">
+                            <div class="card-input-badge">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                                </svg>
+                                SECURE
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label" style="font-size: 13px; color: var(--text-muted);">Expiry
+                                Date</label>
+                            <input type="text" class="form-control" placeholder="MM/YY">
+                        </div>
+                        <div class="col">
+                            <label class="form-label" style="font-size: 13px; color: var(--text-muted);">CVC/CVV</label>
+                            <input type="text" class="form-control" placeholder="123">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PayPal Option -->
+                <div class="payment-option-header" id="opt-paypal" style="border-top: 1px solid var(--border);">
+                    <div class="radio-wrapper">
+                        <input type="radio" name="payment_method" value="paypal" class="custom-radio" id="radio-paypal">
+                        PayPal
+                    </div>
+                    <div class="payment-logos">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal"
+                            style="height: 20px;">
+                    </div>
+                </div>
+                <!-- PayPal Body (hidden initially) -->
+                <div class="payment-body-cc" id="body-paypal"
+                    style="display: none; padding-top: 5px; padding-bottom: 24px; text-align: center;">
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">You will be redirected to
+                        PayPal to complete your purchase securely.</p>
+                </div>
+            </div>
+
+            <!-- Sleek Add-ons List -->
+            <h3
+                style="font-family: 'Outfit', sans-serif; font-size: 18px; margin-bottom: 16px; color: var(--text-main);">
+                Upgrade your order</h3>
+            <div class="addons-list" id="addons-container">
+                <!-- Add-ons injected via JS -->
+            </div>
+
+            <!-- Order SummaryBox -->
+            <div class="order-summary">
+                <div class="summary-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Order Summary
+                </div>
+                <div class="summary-row" id="core-product-row">
+                    <span style="font-weight: 500; color: var(--text-main);">Main Product Access</span>
+                    <span style="font-weight: 600; color: var(--text-main);">$0.00</span>
+                </div>
+                <div id="summary-addons-list">
+                    <!-- Dynamic addons in summary -->
+                </div>
+                <div class="total-row">
+                    <span class="total-label">Total Due Today</span>
+                    <span id="total-price">$0.00</span>
+                </div>
+            </div>
+
+            <button type="button" class="btn-primary btn-success" id="btn-submit">
+                Complete Order
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </button>
+            <div class="secure-text">
+                By clicking "Complete Order", you agree to our Terms & Conditions.
+            </div>
+        </div>
+    </div>
+
+    <!-- Thank You Modal -->
+    <div class="modal-overlay" id="success-modal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h3 class="modal-title">Payment Successful!</h3>
+            <p class="modal-text">Thank you for your order. We've sent a confirmation email to <strong
+                    id="modal-email-text"></strong> with your access details.</p>
+            <button class="btn-primary" onclick="location.reload()" style="padding: 14px; font-size: 16px;">
+                Return to Home
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // State setup
+            const state = {
+                step: 1,
+                email: '',
+                totalPrice: 0,
+                basePrice: 0,
+                addons: [
+                    {
+                        id: 'addon1',
+                        title: '"Alpha Morning" Testosterone Ritual',
+                        promoBox: '🎁 FREE BONUS',
+                        promoClass: 'violet',
+                        desc: 'This 5-minute morning routine naturally boosts your testosterone by 30%.',
+                        originalPrice: 47,
+                        price: 0,
+                        selected: true
+                    },
+                    {
+                        id: 'addon2',
+                        title: '10 "Power Performance" Quick Recipes',
+                        promoBox: '🎁 FREE BONUS',
+                        promoClass: 'violet',
+                        desc: 'Delicious meals to naturally boost your bedroom performance.',
+                        originalPrice: 0,
+                        price: 0,
+                        selected: true
+                    },
+                    {
+                        id: 'addon3',
+                        title: '"Performance Anxiety Destroyer" Audio',
+                        promoBox: '⚡ LIMITED TIME OFFER',
+                        promoClass: '',
+                        desc: 'Eliminate performance anxiety and mental blocks in just 8 days.',
+                        originalPrice: 47,
+                        price: 7,
+                        selected: true
+                    },
+                    {
+                        id: 'addon4',
+                        title: '"Her Secret Desire" Recipe System',
+                        promoBox: '🔥 HIGHLY RECOMMENDED',
+                        promoClass: '',
+                        desc: '15 natural aphrodisiac ingredients to ignite her passion.',
+                        originalPrice: 87,
+                        price: 9,
+                        selected: true
+                    }
+                ]
+            };
+
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const emailInput = document.getElementById('email');
+            const emailError = document.getElementById('email-error');
+            const btnNext = document.getElementById('btn-next');
+            const addonsContainer = document.getElementById('addons-container');
+            const totalPriceEl = document.getElementById('total-price');
+            const summaryAddonsList = document.getElementById('summary-addons-list');
+
+            // Navigation / Timeline Elements
+            const progressLine = document.getElementById('progress-line');
+            const navStep1 = document.getElementById('nav-step-1');
+            const navStep2 = document.getElementById('nav-step-2');
+
+            // Payment Accordion Elements
+            const optCc = document.getElementById('opt-cc');
+            const optPaypal = document.getElementById('opt-paypal');
+            const radioCc = document.getElementById('radio-cc');
+            const radioPaypal = document.getElementById('radio-paypal');
+            const bodyCc = document.getElementById('body-cc');
+            const bodyPaypal = document.getElementById('body-paypal');
+
+            // Modal Elements
+            const btnSubmit = document.getElementById('btn-submit');
+            const successModal = document.getElementById('success-modal');
+            const modalEmailText = document.getElementById('modal-email-text');
+
+            const validateEmail = (email) => {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(String(email).toLowerCase());
+            };
+
+            const renderTotalAndSummary = () => {
+                let currentTotal = state.basePrice;
+                let summaryHtml = '';
+
+                state.addons.forEach(addon => {
+                    if (addon.selected) {
+                        currentTotal += addon.price;
+                        summaryHtml += `
+                            <div class="summary-row" style="margin-top: 6px; margin-bottom: 6px; padding: 0; border: none; font-size: 14px;">
+                                <span style="color: var(--text-main);">+ ${addon.title}</span>
+                                <span style="font-weight: 600; color: var(--text-main);">$${addon.price.toFixed(2)}</span>
+                            </div>
+                        `;
+                    }
+                });
+
+                summaryAddonsList.innerHTML = summaryHtml;
+                state.totalPrice = currentTotal;
+                totalPriceEl.textContent = `$${currentTotal.toFixed(2)}`;
+            };
+
+            const toggleAddon = (addonId) => {
+                const addon = state.addons.find(a => a.id === addonId);
+                if (addon) {
+                    addon.selected = !addon.selected;
+                    const wrapper = document.getElementById(`box-${addonId}`);
+                    const checkbox = document.getElementById(`chk-${addonId}`);
+
+                    if (addon.selected) {
+                        wrapper.classList.add('selected');
+                        checkbox.checked = true;
+                    } else {
+                        wrapper.classList.remove('selected');
+                        checkbox.checked = false;
+                    }
+                    renderTotalAndSummary();
+                }
+            };
+
+            const renderAddons = () => {
+                addonsContainer.innerHTML = '';
+                state.addons.forEach(addon => {
+                    const origPriceHtml = addon.originalPrice ? `<span class="original-price">$${addon.originalPrice}</span>` : '';
+                    const newPriceHtml = addon.price === 0 ? 'FREE' : `$${addon.price}`;
+                    const customBadgeColor = addon.price === 0 ? 'color: #10B981;' : '';
+
+                    const selectedClass = addon.selected ? 'selected' : '';
+                    const checkedAttr = addon.selected ? 'checked' : '';
+                    const promoHtml = addon.promoBox ? `<div class="promo-badge ${addon.promoClass}">${addon.promoBox}</div>` : '';
+
+                    const html = `
+                        <label class="addon-item ${selectedClass}" id="box-${addon.id}">
+                            <input type="checkbox" class="custom-checkbox" id="chk-${addon.id}" data-id="${addon.id}" ${checkedAttr}>
+                            <div class="addon-content">
+                                ${promoHtml}
+                                <div class="addon-header-flex">
+                                    <div class="addon-title">${addon.title}</div>
+                                    <div class="addon-price-tag" style="${customBadgeColor}">${origPriceHtml}${newPriceHtml}</div>
+                                </div>
+                                <div class="addon-desc">${addon.desc}</div>
+                            </div>
+                        </label>
+                    `;
+                    addonsContainer.insertAdjacentHTML('beforeend', html);
+                });
+
+                const checkboxes = addonsContainer.querySelectorAll('.custom-checkbox');
+                checkboxes.forEach(chk => {
+                    chk.addEventListener('change', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        toggleAddon(id);
+                    });
+                });
+            };
+
+            // Workflow Step Navigation
+            const goToStep2 = () => {
+                step1.classList.remove('active');
+                setTimeout(() => {
+                    step1.style.display = 'none';
+                    step2.style.display = 'block';
+                    void step2.offsetWidth; // Recalculate
+                    step2.classList.add('active');
+
+                    // Timeline styling
+                    progressLine.style.width = '100%';
+                    navStep1.classList.remove('active');
+                    navStep1.classList.add('completed');
+                    navStep1.querySelector('.step-dot').innerHTML = '✓';
+
+                    navStep2.classList.add('active');
+                    state.step = 2;
+                }, 400);
+            };
+
+            const goToStep1 = () => {
+                if (state.step !== 2) return;
+
+                step2.classList.remove('active');
+                setTimeout(() => {
+                    step2.style.display = 'none';
+                    step1.style.display = 'block';
+                    void step1.offsetWidth;
+                    step1.classList.add('active');
+
+                    // Timeline styling
+                    progressLine.style.width = '0%';
+                    navStep1.classList.remove('completed');
+                    navStep1.classList.add('active');
+                    navStep1.querySelector('.step-dot').innerHTML = '1';
+
+                    navStep2.classList.remove('active');
+                    state.step = 1;
+                }, 400);
+            };
+
+            // Payment Selection Workflow
+            const selectPayment = (method) => {
+                if (method === 'cc') {
+                    radioCc.checked = true;
+                    bodyCc.style.display = 'block';
+                    bodyPaypal.style.display = 'none';
+                } else if (method === 'paypal') {
+                    radioPaypal.checked = true;
+                    bodyCc.style.display = 'none';
+                    bodyPaypal.style.display = 'block';
+                }
+            };
+
+            // Listeners
+            btnNext.addEventListener('click', () => {
+                const email = emailInput.value.trim();
+                if (validateEmail(email)) {
+                    emailInput.classList.remove('error');
+                    emailError.style.display = 'none';
+                    state.email = email;
+                    goToStep2();
+                } else {
+                    emailInput.classList.add('error');
+                    emailError.style.display = 'block';
+                }
+            });
+
+            // Clickable Timeline Navigation
+            navStep1.addEventListener('click', goToStep1);
+            navStep2.addEventListener('click', () => {
+                if (state.step === 1 && validateEmail(emailInput.value.trim())) {
+                    emailInput.classList.remove('error');
+                    emailError.style.display = 'none';
+                    state.email = emailInput.value.trim();
+                    goToStep2();
+                } else if (state.step === 1) {
+                    emailInput.classList.add('error');
+                    emailError.style.display = 'block';
+                }
+            });
+
+            // Accordion Listeners
+            optCc.addEventListener('click', () => selectPayment('cc'));
+            optPaypal.addEventListener('click', () => selectPayment('paypal'));
+
+            // Submit / Success Modal Workflow
+            btnSubmit.addEventListener('click', () => {
+                modalEmailText.textContent = state.email || "your provided email";
+                successModal.classList.add('show');
+            });
+
+            // Initial Render
+            renderAddons();
+            renderTotalAndSummary();
+        });
+    </script>
+</body>
+
+</html>
